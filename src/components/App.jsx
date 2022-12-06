@@ -11,6 +11,7 @@ export const App = () => {
   const [pictures, setPictures] = useState([]);
   const [imgsSearch, setImgsSearch] = useState('');
   const [isLoad, setIsLoad] = useState(false);
+  const [showBtn,setShowBtn] = useState(false);
   const [page, setPage] = useState(1);
   const [perPage] = useState(12);
   
@@ -20,13 +21,14 @@ export const App = () => {
       async function fetchData() {
         try{
           const newPictures = await API(imgsSearch, perPage, page);
-          setPictures(prevState => [...prevState, ...newPictures]);          
+          setPictures(prevState => [...prevState, ...newPictures.hits]);
+          page !== Math.ceil(newPictures.totalHits / 12) ? setShowBtn(true) : setShowBtn(false)
         }catch(error){
           console.log('error: ', error);
           
         }
       }
-      
+
       fetchData();
       setIsLoad(false);
     },[imgsSearch, page, perPage])
@@ -50,7 +52,7 @@ export const App = () => {
          <ImageGallery  images={pictures} />
         {isLoad && <Loader/>}
         
-           {pictures.length !== 0 && (<LoadMoreBtn onClick={addPage}/>)}
+           { showBtn && (<LoadMoreBtn onClick={addPage}/>)}
         
       </div>
     )    
